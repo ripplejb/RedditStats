@@ -2,8 +2,7 @@ using RedditStats.Models;
 
 namespace RedditStats.Services;
 
-public interface ISubredditService
+public interface ISubredditCommentService
 {
     Task<RedditResponse> Call(string uri);
-    
 }

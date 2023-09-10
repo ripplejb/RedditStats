@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RedditStats.Configs;
+using RedditStats.Services;
 using Serilog;
 using Serilog.Events;
 
@@ -25,9 +26,13 @@ public static class Startup
         Log.Logger.Information("Starting Reddit stat collection app at {date}", DateTime.Now);
 
         var host = Host.CreateDefaultBuilder()
-            .ConfigureServices((context, services) =>
+            .ConfigureServices((_, services) =>
             {
                 services.AddOptions<RedditConfigs>().Bind(configuration.GetSection(nameof(RedditConfigs)));
+                services.AddSingleton<ICommentService, CommentService>();
+                services.AddSingleton<ILinkService, LinkService>();
+                services.AddHttpClient<ISubredditTopService, SubredditTopService>();
+                services.AddHttpClient<ISubredditCommentService, SubredditCommentService>();
                 services.AddSingleton<App>();
             })
             .UseSerilog()

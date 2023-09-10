@@ -3,14 +3,19 @@ namespace RedditStats.Models;
 public class SubredditStatistic
 {
     /// <summary>
-    /// Subreddit or comment Id
+    /// t1 = comment
+    /// t3 = link
     /// </summary>
-    public string Name { get; set; }
+    public string Kind { get; set; } = string.Empty;
+    /// <summary>
+    /// comment Id
+    /// </summary>
+    public string Id { get; set; } = string.Empty;
     public int UpVotes { get; set; }
-    public int NumberOfComments { get; set; }
     /// <summary>
     /// User Id 
     /// </summary>
-    public string Author { get; set; }
+    public string Author { get; set; } = string.Empty;
+    public string Permalink { get; set; } = string.Empty;
     public DateTime CreateTime { get; set; }
 }
