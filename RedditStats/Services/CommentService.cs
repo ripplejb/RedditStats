@@ -1,10 +1,22 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using RedditStats.Helpers;
 using RedditStats.Models;
 
 namespace RedditStats.Services;
 
 public class CommentService : ICommentService
 {
+    private readonly ILogger<CommentService> _logger;
+    private readonly ISubredditStatisticMapper _subredditStatisticMapper;
+    
+    public CommentService(ILogger<CommentService> logger, 
+        ISubredditStatisticMapper subredditStatisticMapper)
+    {
+        _logger = logger;
+        _subredditStatisticMapper = subredditStatisticMapper;
+    }
+
     public Tuple<List<string>, List<SubredditStatistic>> GetResult(RedditResponse redditResponse)
     {
         var stats = new List<SubredditStatistic>();
@@ -13,6 +25,7 @@ public class CommentService : ICommentService
 
         if (redditResponse.SubredditData.Count == 0)
         {
+            _logger.LogWarning("Subreddit data count is 0");
             return new Tuple<List<string>, List<SubredditStatistic>>(uris, stats);
         }
 
@@ -39,7 +52,7 @@ public class CommentService : ICommentService
                     }
                     case "t1":
                     {
-                        var subredditStatistic = GetSubredditStatistic(rd);
+                        var subredditStatistic = _subredditStatisticMapper.MapSubredditData(rd);
                         stats.Add(subredditStatistic);
                         if ((rd.Data["replies"]?.GetValue<string>() ?? string.Empty) == string.Empty)
                         {
@@ -81,16 +94,4 @@ public class CommentService : ICommentService
         }
     }
     
-    private static SubredditStatistic GetSubredditStatistic(SubredditData rd)
-    {
-        var subredditStatistic = new SubredditStatistic
-        {
-            Kind = rd.Kind,
-            CreateTime = DateTime.Now,
-            Author = rd.Data["author"]?.GetValue<string>() ?? string.Empty,
-            Id = rd.Data["id"]?.GetValue<string>() ?? string.Empty,
-            UpVotes = rd.Data["ups"]?.GetValue<int>() ?? 0
-        };
-        return subredditStatistic;
-    }
 }

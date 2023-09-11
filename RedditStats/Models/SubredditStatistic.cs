@@ -16,6 +16,5 @@ public class SubredditStatistic
     /// User Id 
     /// </summary>
     public string Author { get; set; } = string.Empty;
-    public string Permalink { get; set; } = string.Empty;
     public DateTime CreateTime { get; set; }
 }

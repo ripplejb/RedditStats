@@ -2,6 +2,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RedditStats.Configs;
+using RedditStats.Helpers;
 using RedditStats.Services;
 using Serilog;
 using Serilog.Events;
@@ -29,6 +30,7 @@ public static class Startup
             .ConfigureServices((_, services) =>
             {
                 services.AddOptions<RedditConfigs>().Bind(configuration.GetSection(nameof(RedditConfigs)));
+                services.AddSingleton<ISubredditStatisticMapper, SubredditStatisticMapper>();
                 services.AddSingleton<ICommentService, CommentService>();
                 services.AddSingleton<ILinkService, LinkService>();
                 services.AddHttpClient<ISubredditTopService, SubredditTopService>();

@@ -1,15 +1,31 @@
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
+using RedditStats.Helpers;
 using RedditStats.Models;
 
 namespace RedditStats.Services;
 
 public class LinkService : ILinkService
 {
+    
+    private readonly ILogger<LinkService> _logger;
+    private readonly ISubredditStatisticMapper _subredditStatisticMapper;
+    
+    public LinkService(ILogger<LinkService> logger, 
+        ISubredditStatisticMapper subredditStatisticMapper)
+    {
+        _logger = logger;
+        _subredditStatisticMapper = subredditStatisticMapper;
+    }
+
     public List<SubredditStatistic> GetResult(RedditResponse redditResponse)
     {
         var stats = new List<SubredditStatistic>();
-
-        if (redditResponse.SubredditData.Count == 0) return stats;
+        if (redditResponse.SubredditData.Count == 0)
+        {
+            _logger.LogWarning("Subreddit data count is 0");
+            return stats;
+        }
         foreach (var sd in redditResponse.SubredditData)
         {
             if (sd.Kind != "Listing") return stats;
@@ -17,23 +33,11 @@ public class LinkService : ILinkService
             var children = sd.Data["children"].Deserialize<List<SubredditData>>();
             if (children == null) return stats;
         
-            stats.AddRange(from rd in children where rd.Kind == "t3" select GetSubredditStatistic(rd));
+            stats.AddRange(from rd in children where rd.Kind == "t3" 
+                select _subredditStatisticMapper.MapSubredditData(rd));
         }
 
         return stats;
     }
 
-    private static SubredditStatistic GetSubredditStatistic(SubredditData rd)
-    {
-        var subredditStatistic = new SubredditStatistic
-        {
-            Kind = rd.Kind,
-            CreateTime = DateTime.Now,
-            Author = rd.Data["author"]?.GetValue<string>() ?? string.Empty,
-            Id = rd.Data["id"]?.GetValue<string>() ?? string.Empty,
-            UpVotes = rd.Data["ups"]?.GetValue<int>() ?? 0,
-            Permalink = rd.Data["permalink"]?.GetValue<string>() ?? string.Empty
-        };
-        return subredditStatistic;
-    }
 }
