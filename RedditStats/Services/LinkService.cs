@@ -18,26 +18,32 @@ public class LinkService : ILinkService
         _subredditStatisticMapper = subredditStatisticMapper;
     }
 
-    public List<SubredditStatistic> GetResult(RedditResponse redditResponse)
+    public Tuple<List<string>, List<SubredditStatistic>> GetResult(RedditResponse redditResponse)
     {
         var stats = new List<SubredditStatistic>();
+        var permalinks = new List<string>();
         if (redditResponse.SubredditData.Count == 0)
         {
             _logger.LogWarning("Subreddit data count is 0");
-            return stats;
+            return new Tuple<List<string>, List<SubredditStatistic>>(permalinks, stats);
         }
         foreach (var sd in redditResponse.SubredditData)
         {
-            if (sd.Kind != "Listing") return stats;
+            if (sd.Kind != "Listing") return new Tuple<List<string>, List<SubredditStatistic>>(permalinks, stats);
 
             var children = sd.Data["children"].Deserialize<List<SubredditData>>();
-            if (children == null) return stats;
-        
-            stats.AddRange(from rd in children where rd.Kind == "t3" 
-                select _subredditStatisticMapper.MapSubredditData(rd));
+            if (children == null) return new Tuple<List<string>, List<SubredditStatistic>>(permalinks, stats);
+
+            foreach (var rd in children.Where(rd => rd.Kind == "t3"))
+            {
+                stats.Add(_subredditStatisticMapper.MapSubredditData(rd));
+                var pl = rd.Data["permalinks"]?.GetValue<string>() ?? string.Empty;
+                if (pl == string.Empty) continue;
+                permalinks.Add(pl);
+            }
         }
 
-        return stats;
+        return new Tuple<List<string>, List<SubredditStatistic>>(permalinks, stats);
     }
 
 }

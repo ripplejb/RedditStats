@@ -4,5 +4,5 @@ namespace RedditStats.Services;
 
 public interface ILinkService
 {
-    List<SubredditStatistic> GetResult(RedditResponse redditResponse);
+    Tuple<List<string>, List<SubredditStatistic>> GetResult(RedditResponse redditResponse);
 }

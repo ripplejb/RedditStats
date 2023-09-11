@@ -30,6 +30,7 @@ public static class Startup
             .ConfigureServices((_, services) =>
             {
                 services.AddOptions<RedditConfigs>().Bind(configuration.GetSection(nameof(RedditConfigs)));
+                services.AddSingleton<IRateLimitHelper, RateLimitHelper>();
                 services.AddSingleton<ISubredditStatisticMapper, SubredditStatisticMapper>();
                 services.AddSingleton<ICommentService, CommentService>();
                 services.AddSingleton<ILinkService, LinkService>();
