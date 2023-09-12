@@ -22,7 +22,7 @@ public class SubredditCommentService : ISubredditCommentService
         _redditConfigs = redditConfigsOptions.Value;
         _logger = logger;
 
-        httpClient.BaseAddress = new Uri(_redditConfigs.NoAuthBaseUrl);
+        _httpClient.BaseAddress = new Uri(_redditConfigs.NoAuthBaseUrl);
     }
 
     public async Task<RedditResponse> Call(string uri)
