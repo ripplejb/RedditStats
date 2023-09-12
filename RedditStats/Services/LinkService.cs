@@ -37,7 +37,7 @@ public class LinkService : ILinkService
             foreach (var rd in children.Where(rd => rd.Kind == "t3"))
             {
                 stats.Add(_subredditStatisticMapper.MapSubredditData(rd));
-                var pl = rd.Data["permalinks"]?.GetValue<string>() ?? string.Empty;
+                var pl = rd.Data["permalink"]?.GetValue<string>() ?? string.Empty;
                 if (pl == string.Empty) continue;
                 permalinks.Add(pl);
             }

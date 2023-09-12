@@ -29,6 +29,8 @@ public class SubredditTopService : ISubredditTopService
 
     public async Task<RedditResponse> Call(int topCount, string period)
     {
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", new []{"RedditStats",
+            Environment.OSVersion.Platform.ToString(), Environment.OSVersion.VersionString});
         var response = await _httpClient.GetAsync($"/r/{_redditConfigs.Subreddit}/top.json?limit={topCount}&t={period}");
         var redditResponse = new RedditResponse
         {

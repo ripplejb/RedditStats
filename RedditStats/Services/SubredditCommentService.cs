@@ -27,7 +27,9 @@ public class SubredditCommentService : ISubredditCommentService
 
     public async Task<RedditResponse> Call(string uri)
     {
-        var response = await _httpClient.GetAsync(uri);
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", new []{"RedditStats",
+            Environment.OSVersion.Platform.ToString(), Environment.OSVersion.VersionString});
+        var response = await _httpClient.GetAsync($"{uri}.json");
         var redditResponse = new RedditResponse
         {
             RateLimit = _rateLimitHelper.GetRateLimit(response),
