@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using Microsoft.Extensions.Logging;
 using RedditStats.Helpers;
 using RedditStats.Models;
@@ -54,7 +55,7 @@ public class CommentService : ICommentService
                     {
                         var subredditStatistic = _subredditStatisticMapper.MapSubredditData(rd);
                         stats.Add(subredditStatistic);
-                        if ((rd.Data["replies"]?.GetValue<string>() ?? string.Empty) == string.Empty)
+                        if (rd.Data["replies"] is JsonValue)
                         {
                             continue;
                         }

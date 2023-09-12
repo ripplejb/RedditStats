@@ -60,7 +60,7 @@ public class App
                 {
                     var uri = queue.Dequeue();
                     remainingCalls--;
-                    tasks.Add(Task.Run(() => _subredditCommentService.Call(uri), token));
+                    tasks.Add(_subredditCommentService.Call(uri));
                 }
 
                 topResponse.RateLimit.RemainingCalls = remainingCalls;
@@ -88,8 +88,8 @@ public class App
                 if (remainingCalls != 0) continue;
                 var topUsers = result.GroupBy(r => r.Author)
                     .Select(r => new { User = r.Key, PostCount = r.Count() })
-                    .OrderBy(r => r.PostCount).First();
-                var topPost = result.OrderBy(r => r.UpVotes)
+                    .OrderByDescending(r => r.PostCount).First();
+                var topPost = result.OrderByDescending(r => r.UpVotes)
                     .Select(r => new { PostId = r.Id, UpVotes = r.UpVotes }).First();
                 _logger.LogInformation("Post {post} has upvotes {votes}", topPost.PostId, topPost.UpVotes);
                 _logger.LogInformation("User {user} wrote {count} posts.", topUsers.User, topUsers.PostCount);
